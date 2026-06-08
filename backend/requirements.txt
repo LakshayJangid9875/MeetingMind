@@ -1,5 +1,7 @@
 fastapi
+python-multipart
 uvicorn
+openai-whisper
 motor
 python-dotenv
 python-jose
