@@ -30,11 +30,14 @@ Return this structure:
   "meeting_mood": ""
 }}
 """
+        print("🧠 Sending transcript to Gemini...")
 
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
         )
+
+        print("✅ Gemini response received")
 
         text = response.text.strip()
 
@@ -46,12 +49,16 @@ Return this structure:
 
         text = text.strip()
 
+        print("📄 Parsing Gemini JSON response...")
+
         data = json.loads(text)
+
+        print("✅ JSON parsed successfully")
 
         await db.meetings.update_one(
             {"_id": ObjectId(meeting_id)},
             {"$set": {
-                "status": "ready",
+                "status": "completed",
                 "summary": data.get("summary", ""),
                 "key_points": data.get("key_points", []),
                 "decisions": data.get("decisions", []),
@@ -66,6 +73,7 @@ Return this structure:
         from services.embeddings import add_meeting_embedding
         meeting_doc = await db.meetings.find_one({"_id": ObjectId(meeting_id)})
         if meeting_doc:
+            print("🔎 Creating embeddings...")
             add_meeting_embedding(
                 meeting_id=meeting_id,
                 user_id=meeting_doc.get("user_id", ""),
@@ -73,6 +81,7 @@ Return this structure:
                 transcript=meeting_doc.get("transcript", ""),
                 summary=data.get("summary", "")
             )
+            print("✅ Embeddings created")
 
         print(f"✅ Analysis complete for meeting {meeting_id}")
 

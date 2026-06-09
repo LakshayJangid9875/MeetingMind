@@ -10,8 +10,16 @@ async def export_to_notion(meeting: dict) -> str:
         notion = Client(auth=os.getenv("NOTION_API_KEY"))
         page_id = os.getenv("NOTION_PAGE_ID")
 
+        if not page_id:
+            raise Exception("NOTION_PAGE_ID not configured")
+
+        if not os.getenv("NOTION_API_KEY"):
+            raise Exception("NOTION_API_KEY not configured")
+
         action_items_text = "\n".join([
-            f"• {item['task']} — {item['assigned_to']} (Due: {item['deadline']})"
+            f"• {item.get('task', 'Task')} — "
+            f"{item.get('assigned_to', 'Unassigned')} "
+            f"(Due: {item.get('deadline', 'Not specified')})"
             for item in meeting.get("action_items", [])
         ])
 
@@ -23,7 +31,11 @@ async def export_to_notion(meeting: dict) -> str:
             parent={"page_id": page_id},
             properties={
                 "title": {
-                    "title": [{"text": {"content": meeting["title"]}}]
+                    "title": [{
+                        "text": {
+                            "content": meeting.get("title", "Untitled Meeting")
+                        }
+                    }]
                 }
             },
             children=[

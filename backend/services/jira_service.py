@@ -7,6 +7,16 @@ load_dotenv()
 async def create_jira_tickets(meeting: dict, project_key: str) -> list:
     """Create Jira tickets for each action item in the meeting."""
     try:
+        if not os.getenv("JIRA_URL"):
+            raise Exception("JIRA_URL not configured")
+
+        if not os.getenv("JIRA_EMAIL"):
+            raise Exception("JIRA_EMAIL not configured")
+
+        if not os.getenv("JIRA_API_TOKEN"):
+            raise Exception("JIRA_API_TOKEN not configured")
+
+
         jira = JIRA(
             server=os.getenv("JIRA_URL"),
             basic_auth=(os.getenv("JIRA_EMAIL"), os.getenv("JIRA_API_TOKEN"))
@@ -16,8 +26,12 @@ async def create_jira_tickets(meeting: dict, project_key: str) -> list:
         for item in meeting.get("action_items", []):
             issue = jira.create_issue(
                 project=project_key,
-                summary=item["task"],
-                description=f"Assigned to: {item['assigned_to']}\nDeadline: {item['deadline']}\nFrom meeting: {meeting['title']}",
+                summary=item.get("task", "Action Item"),
+                description=(
+                    f"Assigned to: {item.get('assigned_to', 'Unassigned')}\n"
+                    f"Deadline: {item.get('deadline', 'Not specified')}\n"
+                    f"From meeting: {meeting.get('title', 'Meeting')}"
+                ),
                 issuetype={"name": "Task"},
             )
             created.append({"key": issue.key, "url": f"{os.getenv('JIRA_URL')}/browse/{issue.key}"})

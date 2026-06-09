@@ -44,7 +44,7 @@ async def upload_meeting(
     meeting_doc = {
         "user_id":      str(current_user["_id"]),
         "title":        title,
-        "status":       "uploading",
+        "status":       "queued",
         "filename":     filename,
         "file_path":    file_path,
         "created_at":   datetime.utcnow(),
@@ -67,8 +67,13 @@ async def upload_meeting(
 
 
 async def transcribe_in_background(file_path, meeting_id, db):
+    print(f"🚀 Background task started: {meeting_id}")
+
     from services.transcription import transcribe_audio
+
     await transcribe_audio(file_path, meeting_id, db)
+
+    print(f"✅ Background task finished: {meeting_id}")
 
 
 @router.get("/")

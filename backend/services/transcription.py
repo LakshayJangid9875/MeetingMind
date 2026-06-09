@@ -3,14 +3,24 @@ import os
 import asyncio
 from datetime import datetime
 
-os.environ["PATH"] += os.pathsep + r"C:\ffmpeg\ffmpeg-8.1.1-essentials_build\bin"
 
-model = whisper.load_model("base")
+model = None
+
+def get_model():
+    global model
+
+    if model is None:
+        print("📥 Loading Whisper model...")
+        model = whisper.load_model("tiny")
+        print("✅ Whisper model loaded")
+
+    return model
 
 async def transcribe_audio(file_path: str, meeting_id: str, db) -> None:
     from bson import ObjectId
 
     try:
+        print(f"🚀 Background transcription started for {meeting_id}")
         await db.meetings.update_one(
             {"_id": ObjectId(meeting_id)},
             {"$set": {"status": "transcribing"}}
@@ -24,11 +34,15 @@ async def transcribe_audio(file_path: str, meeting_id: str, db) -> None:
         import shutil
         print("FFmpeg path:", shutil.which("ffmpeg"))
 
+        print("🚀 Starting transcription...")
+
         loop = asyncio.get_running_loop()
         result = await loop.run_in_executor(
             None,
-            lambda: model.transcribe(fp, verbose=False)
+            lambda: get_model().transcribe(fp, verbose=False)
         )
+
+        print("✅ Transcription finished")
 
         transcript = result["text"].strip()
         segments   = result.get("segments", [])
@@ -55,14 +69,28 @@ async def transcribe_audio(file_path: str, meeting_id: str, db) -> None:
         print(f"✅ Transcription complete for meeting {meeting_id}")
 
         from .summarization import analyze_meeting
+        print("🧠 Starting AI analysis...")
+
         await analyze_meeting(meeting_id, transcript, db)
 
+        print("✅ AI analysis complete")
+
     except Exception as e:
-        print(f"❌ Transcription failed for {meeting_id}: {e}")
+        import traceback
+
+        print(f"❌ Transcription failed for {meeting_id}")
+        print(traceback.format_exc())
+
         await db.meetings.update_one(
             {"_id": ObjectId(meeting_id)},
-            {"$set": {"status": "failed", "error": str(e)}}
+            {
+                "$set": {
+                    "status": "failed",
+                    "error": str(e)
+                }
+            }
         )
+
     finally:
         if os.path.exists(str(file_path)):
             os.remove(str(file_path))
