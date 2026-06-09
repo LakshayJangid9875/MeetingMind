@@ -1,6 +1,18 @@
+# Python
 venv/
 __pycache__/
 *.pyc
 .env
 uploads/
+chroma_db/
 .pytest_cache/
+
+# Node
+node_modules/
+build/
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db

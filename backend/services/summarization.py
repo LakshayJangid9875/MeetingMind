@@ -62,6 +62,18 @@ Return this structure:
             }}
         )
 
+        # Store embedding for semantic search
+        from services.embeddings import add_meeting_embedding
+        meeting_doc = await db.meetings.find_one({"_id": ObjectId(meeting_id)})
+        if meeting_doc:
+            add_meeting_embedding(
+                meeting_id=meeting_id,
+                user_id=meeting_doc.get("user_id", ""),
+                title=meeting_doc.get("title", ""),
+                transcript=meeting_doc.get("transcript", ""),
+                summary=data.get("summary", "")
+            )
+
         print(f"✅ Analysis complete for meeting {meeting_id}")
 
     except Exception as e:

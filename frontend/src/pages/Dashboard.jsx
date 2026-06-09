@@ -1,3 +1,4 @@
+import SearchBar from '../components/SearchBar';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
@@ -33,21 +34,24 @@ export default function Dashboard() {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              Welcome back, {user?.name?.split(' ')[0]} 👋
-            </h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Here's what's happening with your meetings.
-            </p>
-          </div>
-          <Link
-            to="/upload"
-            className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-medium px-4 py-2.5 rounded-xl transition-colors text-sm"
-          >
-            <span>⬆️</span> Upload meeting
-          </Link>
-        </div>
+  <div>
+    <h1 className="text-2xl font-bold text-white">
+      Welcome back, {user?.name?.split(' ')[0]} 👋
+    </h1>
+    <p className="text-gray-400 text-sm mt-1">
+      Here's what's happening with your meetings.
+    </p>
+  </div>
+  <div className="flex items-center gap-3">
+    <SearchBar />
+    <Link
+      to="/upload"
+      className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-medium px-4 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap"
+    >
+      <span>⬆️</span> Upload
+    </Link>
+  </div>
+</div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
