@@ -8,7 +8,7 @@ import { Skeleton } from '../components/ui/Skeleton';
 import api from '../api/axios';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, CartesianGrid
+  PieChart, Pie, Cell, CartesianGrid
 } from 'recharts';
 
 const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
