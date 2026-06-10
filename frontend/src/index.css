@@ -33,6 +33,7 @@ body {
   line-height: 1.6;
 }
 
+
 /* Custom scrollbar */
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #111827; }
