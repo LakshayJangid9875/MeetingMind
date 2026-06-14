@@ -1,53 +1,47 @@
 import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import clsx from 'clsx';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Input({
-  label,
-  error,
-  type = 'text',
-  icon,
-  className,
-  ...props
+  label, error, hint, type = 'text',
+  icon, iconRight, className, required, ...props
 }) {
-  const [showPassword, setShowPassword] = useState(false);
+  const [show, setShow] = useState(false);
+  const { theme } = useTheme();
   const isPassword = type === 'password';
 
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-          {label}
+        <label className={clsx('block text-sm font-medium mb-1.5', theme === 'dark' ? 'text-dark-muted' : 'text-light-muted')}>
+          {label} {required && <span className="text-danger">*</span>}
         </label>
       )}
       <div className="relative">
-        {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-            {icon}
-          </span>
-        )}
+        {icon && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">{icon}</span>}
         <input
-          type={isPassword && showPassword ? 'text' : type}
+          type={isPassword && show ? 'text' : type}
           className={clsx(
-            'w-full bg-gray-900 border rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm outline-none transition-all',
-            'focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20',
-            error ? 'border-red-500' : 'border-gray-700 hover:border-gray-600',
-            icon && 'pl-9',
-            isPassword && 'pr-10',
+            'input',
+            icon && 'pl-10',
+            (isPassword || iconRight) && 'pr-10',
+            error && '!border-danger focus:!ring-danger/30',
             className
           )}
           {...props}
         />
         {isPassword && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-sm"
+          <button type="button" onClick={() => setShow(!show)}
+            className={clsx('absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors', theme === 'dark' ? 'text-dark-muted hover:text-dark-text' : 'text-light-muted hover:text-light-text')}
           >
-            {showPassword ? '🙈' : '👁️'}
+            {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
+        {iconRight && !isPassword && <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400">{iconRight}</span>}
       </div>
-      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+      {error && <p className="text-danger text-xs mt-1.5 flex items-center gap-1">⚠ {error}</p>}
+      {hint && !error && <p className={clsx('text-xs mt-1.5', theme === 'dark' ? 'text-dark-muted' : 'text-light-muted')}>{hint}</p>}
     </div>
   );
 }

@@ -1,17 +1,30 @@
 import clsx from 'clsx';
 
 const variants = {
-  default:  'bg-gray-700 text-gray-300',
-  success:  'bg-green-500/10 text-green-400 border border-green-500/20',
-  warning:  'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-  error:    'bg-red-500/10 text-red-400 border border-red-500/20',
-  info:     'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+  default:  'bg-gray-500/10 text-gray-400 border border-gray-500/20',
+  success:  'bg-success/10 text-success border border-success/20',
+  warning:  'bg-warning/10 text-warning border border-warning/20',
+  danger:   'bg-danger/10  text-danger  border border-danger/20',
+  info:     'bg-brand-500/10 text-brand-400 border border-brand-500/20',
   brand:    'bg-brand-500/10 text-brand-400 border border-brand-500/20',
+  accent:   'bg-accent-500/10 text-accent-400 border border-accent-500/20',
 };
 
-export default function Badge({ children, variant = 'default', className }) {
+const sizes = {
+  sm: 'px-2 py-0.5 text-xs',
+  md: 'px-2.5 py-1 text-xs',
+  lg: 'px-3 py-1.5 text-sm',
+};
+
+export default function Badge({ children, variant = 'default', size = 'md', dot = false, className }) {
   return (
-    <span className={clsx('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', variants[variant], className)}>
+    <span className={clsx('inline-flex items-center gap-1.5 font-medium rounded-full', variants[variant], sizes[size], className)}>
+      {dot && <span className={clsx('w-1.5 h-1.5 rounded-full', {
+        'bg-success': variant === 'success',
+        'bg-warning': variant === 'warning',
+        'bg-danger':  variant === 'danger',
+        'bg-brand-400': variant === 'info' || variant === 'brand',
+      })} />}
       {children}
     </span>
   );

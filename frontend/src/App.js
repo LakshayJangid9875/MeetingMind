@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import LandingPage   from './pages/LandingPage';
@@ -32,26 +33,38 @@ function AnimatedRoutes() {
   );
 }
 
+function ToasterWrapper() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        style: {
+          background: isDark ? '#1E293B' : '#FFFFFF',
+          color:      isDark ? '#F8FAFC' : '#0F172A',
+          border:     isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontFamily: 'Inter, sans-serif',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+        },
+        success: { iconTheme: { primary: '#10B981', secondary: isDark ? '#1E293B' : '#fff' } },
+        error:   { iconTheme: { primary: '#EF4444', secondary: isDark ? '#1E293B' : '#fff' } },
+      }}
+    />
+  );
+}
+
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: '#111827',
-              color: '#f9fafb',
-              border: '1px solid #1f2937',
-              borderRadius: '12px',
-              fontSize: '14px',
-            },
-            success: { iconTheme: { primary: '#10b981', secondary: '#111827' } },
-            error:   { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
-          }}
-        />
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <ToasterWrapper />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
